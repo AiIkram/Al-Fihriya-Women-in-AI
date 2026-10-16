@@ -1,20 +1,20 @@
 import { CalendarClock, Globe2, Radio } from "lucide-react";
 import Reveal from "./Reveal";
 
-const traditions = [
+const gatherings = [
   {
     code: "OP-01",
-    title: "Monthly Catch-Up",
-    cadence: "Last Friday · every month",
+    title: "Monthly Catch Up",
+    cadence: "Last Friday of each month",
     time: "20:00 Paris",
     body:
-      "Informal video circle to report progress, unblock each other, review draft figures, and share wins. No agenda pressure — come as you are.",
+      "Informal video circle to report progress, unblock each other, review draft figures, and share wins. There is no pressure to prepare anything. Just come as you are.",
     status: "Active",
   },
   {
     code: "OP-02",
-    title: "Work–Life Harmony",
-    cadence: "Last Friday · January",
+    title: "Work and Life",
+    cadence: "Last Friday of January",
     time: "20:00 Paris",
     body:
       "Dedicated session on the real trade-offs of research: family, caregiving, funding pressure, and protecting the parts of life that make the work possible.",
@@ -23,7 +23,7 @@ const traditions = [
   {
     code: "OP-03",
     title: "Academic Planning",
-    cadence: "Last Friday · May",
+    cadence: "Last Friday of May",
     time: "20:00 Paris",
     body:
       "Forward planning for the year: conference deadlines, summer schools, journal targets, and forming cross-institution co-author teams before the cutoff.",
@@ -32,7 +32,7 @@ const traditions = [
   {
     code: "OP-04",
     title: "Student Mentorship",
-    cadence: "Last Friday · August (from 2027)",
+    cadence: "Last Friday of August, starting in 2027",
     time: "20:00 Paris",
     body:
       "Students submit questions through a form beforehand; senior researchers and engineers answer them live, with follow-ups in the comms channel.",
@@ -61,15 +61,14 @@ export default function Gatherings() {
               <div className="flex items-center gap-2.5">
                 <CalendarClock size={15} className="text-signal-deep" />
                 <span className="label-plate text-graphite">
-                  Operations Schedule · All times 20:00 Paris
+                  Community Gatherings · 20:00 Paris time
                 </span>
               </div>
               <h2 className="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-[-0.02em] text-carbon sm:text-5xl">
                 The cadence that keeps us moving.
               </h2>
               <p className="mt-4 max-w-xl text-[16.5px] leading-[1.75] text-steel">
-                Four recurring operations per year. Attendance is optional, always
-                recorded, and summaries are posted in the comms channel afterwards.
+                We plan a few regular online gatherings throughout the year. Joining is optional, and we will share a summary afterwards for anyone who cannot make it.
               </p>
             </div>
 
@@ -88,8 +87,7 @@ export default function Gatherings() {
                 ))}
               </div>
               <p className="mt-3 font-mono text-[10.5px] leading-relaxed text-mist">
-                Paris alternates CET/CEST — times shown are indicative and confirmed in
-                each event post.
+                Paris changes between CET and CEST during the year, so we will confirm the local time in each event announcement.
               </p>
             </div>
           </div>
@@ -97,7 +95,7 @@ export default function Gatherings() {
 
         {/* schedule rail */}
         <div className="mt-12 space-y-3">
-          {traditions.map((t, i) => (
+          {gatherings.map((t, i) => (
             <Reveal key={t.code} delay={i * 0.06}>
               <article className="instrument-panel flex flex-col gap-5 rounded-2xl p-6 sm:flex-row sm:items-start">
                 {/* rail */}

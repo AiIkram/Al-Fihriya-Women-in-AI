@@ -9,7 +9,7 @@ const channels = [
     code: "BUS-01",
     title: "Opportunity feed",
     body:
-      "Calls for papers, deadline alerts (NeurIPS, CVPR, MICCAI, ICML), funded PhD/postdoc openings, fellowships and summer schools — posted the day they open.",
+      "Calls for papers, conference deadlines, funded PhD and postdoc openings, fellowships, and summer schools. We share opportunities as we come across them.",
   },
   {
     icon: GitBranch,
@@ -23,7 +23,7 @@ const channels = [
     code: "BUS-03",
     title: "Support channel",
     body:
-      "The quiet one. Career questions, rejection debriefs, visa and relocation advice, and the reality of juggling research with the rest of a life.",
+      "A place to ask career questions, talk through setbacks, exchange practical advice, and be honest about balancing research with the rest of life.",
   },
 ];
 
@@ -83,9 +83,7 @@ export default function Comms() {
                   Travelling to a conference? Post it.
                 </h3>
                 <p className="mt-2 max-w-xl text-[14.5px] leading-[1.7] text-lab/65">
-                  Members share travel plans for NeurIPS, CVPR, MICCAI, ICRA and
-                  workshops so sisters in the same city can arrange coffee, lab tours
-                  and co-author meetings in person.
+                  Members can share plans for conferences and workshops, connect with others attending, and arrange meetups or explore opportunities to work together.
                 </p>
               </div>
             </div>

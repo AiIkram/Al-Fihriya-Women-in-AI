@@ -36,9 +36,7 @@ export default function Footer() {
               <FullLogo size={40} />
             </a>
             <p className="mt-4 max-w-sm text-[14.5px] leading-[1.75] text-steel">
-              An international research fellowship for women across every discipline
-              of artificial intelligence. Rigorous methods, shared tooling, and
-              mentorship without gatekeeping.
+              A welcoming international community for women in AI, computer science, and medical imaging. We share knowledge, support one another, and work toward better research together.
             </p>
 
             {socials.length > 0 && (

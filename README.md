@@ -1,7 +1,7 @@
 # Al-Fihriya — Women in AI
 
-An international research fellowship for women across **every discipline of artificial
-intelligence** — machine learning, computer vision, robotics, medical imaging,
+An international research community for women working across artificial intelligence,
+including machine learning, computer vision, robotics, medical imaging,
 neuroscience, astrophysics, theoretical ML, and AI safety.
 
 Built with **React 19, TypeScript, Vite, Tailwind CSS v4, Framer Motion and Lucide**.
@@ -59,7 +59,7 @@ Accepts `theme="light" | "dark"` and `animate`.
 | `#modules` | Module rack | 8 AI disciplines, each with scope, toolchain and publication venues |
 | `#bench` | Instrument bench | The interactive panel above |
 | `#heritage` | Heritage record | SVG astrolabe/observatory blueprint honouring Fatima al-Fihri (859 AD) |
-| `#gatherings` | Operations schedule | 4 recurring traditions + local timezone conversion grid |
+| `#gatherings` | Operations schedule | 4 recurring community gatherings + local timezone conversion grid |
 | `#comms` | Comms bus | Private channel: opportunity feed, technical threads, support |
 | `#principles` | Operating values | 04 enforced rules |
 | `#students` | Intake | What students and early-career members actually get |

@@ -5,23 +5,23 @@ import Reveal from "./Reveal";
 const faqs = [
   {
     q: "Who can join?",
-    a: "Women working or studying in any area of AI and adjacent computational science — machine learning, computer vision, robotics, NLP, medical imaging, neuroscience, theoretical ML, and AI safety. Students, researchers, engineers, faculty and industry practitioners are all welcome.",
+    a: "Women studying or working in AI, computer science, medical imaging, and related fields are welcome. That includes students, engineers, researchers, academics, and professionals at every stage of their journey.",
   },
   {
     q: "Do I have to specialise in one subfield?",
-    a: "No. The fellowship spans eight active modules, from foundation models to astrophysics and safety. Many members work across several, and cross-module collaboration is the point.",
+    a: "Not at all. Our members work across different areas, from machine learning and computer vision to medical imaging and AI safety. We encourage people to learn from one another and explore work beyond their own specialism.",
   },
   {
     q: "Do I need publications or an existing role?",
-    a: "No. Members range from undergraduates writing their first training loop to professors and research directors. Stage is not a filter — participation and good faith are.",
+    a: "No. Students, early career researchers, experienced academics, engineers, and industry professionals are all welcome. You do not need an impressive CV to take part. Curiosity, respect, and a willingness to contribute matter more.",
   },
   {
     q: "Is the community international?",
     a: "Yes. Members are based across Algeria, Europe, North America, the Middle East, Africa, Asia and Latin America. Sessions are online, and travel meetups happen at major conferences.",
   },
   {
-    q: "Is it open to all religions and backgrounds?",
-    a: "Completely. Muslim, Christian, Jewish, Hindu, secular and nonreligious women are all members and equally welcome. There is no belief, cultural or dress requirement — only mutual respect.",
+    q: "What kind of community are you building?",
+    a: "A welcoming research community for women from different countries, cultures, and backgrounds. We share a love of learning, respect one another, and make room for different perspectives while working toward common academic goals.",
   },
   {
     q: "How do I take part?",
@@ -50,8 +50,7 @@ export default function Faq() {
                 Frequently asked.
               </h2>
               <p className="mt-4 text-[16px] leading-[1.75] text-steel">
-                Straight answers on eligibility, scope and how the fellowship
-                operates day to day.
+                A few helpful answers about joining, what we do, and how to take part.
               </p>
             </div>
           </Reveal>

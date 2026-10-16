@@ -17,13 +17,13 @@ const principles = [
     code: "VAL-03",
     title: "Generous mentorship",
     body:
-      "Senior members give real time — paper clinics, proposal reads, career calls — because someone once did it for us.",
+      "Senior members give real time, paper clinics, proposal reads, career calls, because someone once did it for us.",
   },
   {
     code: "VAL-04",
     title: "Universal belonging",
     body:
-      "Open to women of every faith, culture, country and stage — Muslim, Christian, Jewish, Hindu, secular, and everyone else. No belief test, ever.",
+      "We welcome women from different countries, cultures, and backgrounds. What brings us together is our interest in research, our respect for one another, and our willingness to share what we learn.",
   },
 ];
 

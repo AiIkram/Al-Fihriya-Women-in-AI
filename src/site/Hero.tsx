@@ -5,7 +5,7 @@ import Emblem from "./Emblem";
 const stats = [
   { k: "Fields", v: "ALL AI DOMAINS" },
   { k: "Cadence", v: "MONTHLY · 20:00 CET" },
-  { k: "Access", v: "ALL FAITHS · ALL NATIONS" },
+  { k: "Access", v: "WOMEN · EVERYWHERE" },
   { k: "Mode", v: "PEER-LED MENTORSHIP" },
 ];
 
@@ -13,7 +13,7 @@ const boot = [
   { k: "UNIT", v: "AL-FIHRIYA / W_AI-01" },
   { k: "DOMAIN", v: "ML · CV · RL · NLP · MED-AI" },
   { k: "HERITAGE", v: "AL-QARAWIYYIN · 859 AD" },
-  { k: "PROTOCOL", v: "OPEN SCIENCE / MULTI-FAITH" },
+  { k: "APPROACH", v: "OPEN SCIENCE / SHARED KNOWLEDGE" },
   { k: "STATE", v: "COMMUNITY ACTIVE", live: true },
 ];
 
@@ -70,13 +70,12 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.16 }}
             >
-              Al-Fihriya is an international research fellowship for women engineers,
+              Al-Fihriyya is an international research community for women engineers,
               academics, and students working across{" "}
               <strong className="font-semibold text-carbon">
                 machine learning, computer vision, robotics, neuroscience, and medical AI
               </strong>
-              . We share code, review papers, and train each other — with rigour and
-              without gatekeeping.
+              . We share code, discuss papers, and help each other grow as researchers. We believe good research is stronger when knowledge is shared.
             </motion.p>
 
             <motion.div

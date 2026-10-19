@@ -179,7 +179,7 @@ export default function Disciplines() {
   const ActiveIcon = active.icon;
 
   return (
-    <section id="modules" className="relative border-t border-line bg-lab py-20 sm:py-28">
+    <section id="modules" className="scroll-mt-20 relative border-t border-line bg-lab py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5">
         <Reveal>
           <div className="max-w-2xl">

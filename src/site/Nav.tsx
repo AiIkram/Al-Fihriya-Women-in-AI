@@ -24,25 +24,9 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [open]);
-
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-[100] isolate transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled
           ? "border-b border-line bg-lab/92 backdrop-blur-md"
           : "bg-transparent"
@@ -75,11 +59,9 @@ export default function Nav() {
         </ul>
 
         <button
-          type="button"
-          className="relative z-[102] grid h-11 w-11 touch-manipulation place-items-center rounded-lg border border-line bg-white text-carbon lg:hidden"
-          onClick={() => setOpen((current) => !current)}
+          className="grid h-10 w-10 place-items-center rounded-lg border border-line bg-white text-carbon lg:hidden"
+          onClick={() => setOpen(!open)}
           aria-expanded={open}
-          aria-controls="mobile-primary-menu"
           aria-label={open ? "Close menu" : "Open menu"}
         >
           {open ? <X size={20} /> : <Menu size={20} />}
@@ -89,21 +71,23 @@ export default function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            id="mobile-primary-menu"
-            role="region"
-            aria-label="Mobile navigation links"
-            className="relative z-[101] max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-line bg-lab px-5 py-5 shadow-lg lg:hidden"
+            className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain border-t border-line bg-lab px-5 py-5 lg:hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.22, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: reduce ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
           >
             <ul className="space-y-1">
               {links.map((l) => (
                 <li key={l.href}>
                   <a
                     href={l.href}
-                    onClick={() => setOpen(false)}
+                    onClick={() => {
+                      // Do not lock body scrolling while the mobile menu is open:
+                      // native hash navigation can update the URL without scrolling on mobile.
+                      document.body.style.overflow = "";
+                      setOpen(false);
+                    }}
                     className="flex items-center gap-2.5 border-b border-line/70 py-3.5 font-display text-[17px] font-semibold text-carbon"
                   >
                     <span className="led bg-signal-deep" />

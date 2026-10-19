@@ -1,10 +1,11 @@
+import fatimaPortrait from "../assets/fatima-al-fihriya.png";
 import Reveal from "./Reveal";
 
 /** Portrait supplied for the Al-Fihriya heritage section. */
 function HeritagePortrait() {
   return (
     <div className="instrument-panel-dark overflow-hidden rounded-2xl">
-      <img src={`${import.meta.env.BASE_URL}images/fatima-al-fihriya.png`} alt="Historical-style portrait representing Fatima al-Fihriya, holding a manuscript" className="block h-auto max-h-[760px] w-full object-cover object-top" loading="lazy" />
+      <img src={fatimaPortrait} alt="Historical-style portrait representing Fatima al-Fihriya, holding a manuscript" className="block h-auto max-h-[760px] w-full object-cover object-top" loading="lazy" />
       <div className="grid grid-cols-3 gap-2 border-t border-line-dark px-5 py-4 sm:px-6">
         {[["Founded", "859 AD"], ["Location", "Fez, Morocco"], ["Founder", "Fatima al-Fihri"]].map(([k, v]) => (
           <div key={k}><div className="label-plate text-mist">{k}</div><div className="mt-1 font-mono text-[11px] font-bold text-signal sm:text-xs">{v}</div></div>

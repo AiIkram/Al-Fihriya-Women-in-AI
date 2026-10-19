@@ -99,7 +99,7 @@ export default function CommunityPoll() {
                   </button>;
                 })}
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-steel">{data.myVote ? "Thanks for sharing your place in the community." : "{sharedVotingEnabled ? "Your vote is saved to the community poll." : "Preview mode: this vote is saved only in this browser until shared voting is configured."}"}</p>
+              <p className="mt-4 text-xs leading-relaxed text-steel">{data.myVote ? "Thanks for sharing your place in the community." : sharedVotingEnabled ? "Your vote is saved to the community poll." : "Your vote is saved on this device. Votes from other visitors are not included without a shared server."}</p>
             </div>
           </Reveal>
           <Reveal delay={0.14}>
@@ -112,7 +112,7 @@ export default function CommunityPoll() {
                   return <div key={option.id}><div className="mb-2 flex items-center justify-between gap-3 text-sm"><span className="text-lab">{option.title}</span><span className="font-mono text-signal">{pct}% <span className="text-mist">({count})</span></span></div><div className="h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-signal transition-all duration-500" style={{ width: `${pct}%` }} /></div></div>;
                 })}
               </div>
-              <p className="mt-6 border-t border-line-dark pt-4 text-xs leading-relaxed text-mist">{sharedVotingEnabled ? "Community-wide totals refresh automatically about every 15 seconds." : "Preview statistics are local to this browser. Configure Supabase to collect and display votes from all visitors and devices."}</p>
+              <p className="mt-6 border-t border-line-dark pt-4 text-xs leading-relaxed text-mist">{sharedVotingEnabled ? "Community-wide totals refresh automatically about every 15 seconds." : "These totals are saved on this device and increase with each vote here. GitHub Pages alone cannot combine votes from different visitors."}</p>
             </div>
           </Reveal>
         </div>

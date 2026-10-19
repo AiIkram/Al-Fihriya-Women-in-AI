@@ -105,3 +105,15 @@ npm run dev      # http://localhost:5173
 npm run build    # → dist/
 npm run preview
 ```
+
+
+## Shared community poll (required for cross-device statistics)
+
+The poll can use Supabase so votes from all visitors contribute to the same statistics. Create a Supabase project, run `supabase/community_votes.sql` in its SQL Editor, then add these environment variables to your deployment settings (and to a local `.env` for development):
+
+```
+VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
+```
+
+Redeploy after setting them. Until configured, the poll intentionally stays in local preview mode and does not claim that local browser votes are community-wide. Shared counts refresh every 15 seconds. Anonymous poll submissions are public; do not store personal information in this table.

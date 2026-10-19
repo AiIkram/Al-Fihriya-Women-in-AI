@@ -9,6 +9,9 @@ const options = [
   { id: "other", title: "Something else", description: "My path doesn't fit one of these labels." },
 ];
 const STORAGE_KEY = "alfihriya-community-poll-v1";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const sharedVotingEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 type PollData = { counts: Record<string, number>; myVote: string | null };
 const empty: PollData = { counts: {}, myVote: null };
 
@@ -16,15 +19,59 @@ export default function CommunityPoll() {
   const [data, setData] = useState<PollData>(empty);
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setData({ ...empty, ...JSON.parse(saved) });
-    } catch { /* Keep the poll usable if browser storage is unavailable. */ }
-    setReady(true);
+    let alive = true;
+    async function loadShared() {
+      if (sharedVotingEnabled) {
+        try {
+          const response = await fetch(`${SUPABASE_URL}/rest/v1/community_votes?select=role`, {
+            headers: { apikey: SUPABASE_ANON_KEY!, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+          });
+          if (!response.ok) throw new Error("Could not load shared votes");
+          const rows = await response.json() as Array<{ role: string }>;
+          const counts: Record<string, number> = {};
+          rows.forEach(({ role }) => { counts[role] = (counts[role] || 0) + 1; });
+          const myVote = localStorage.getItem(`${STORAGE_KEY}:myVote`);
+          if (alive) setData({ counts, myVote });
+        } catch {
+          // Do not silently present local counts as community-wide statistics.
+          if (alive) setData({ ...empty, myVote: localStorage.getItem(`${STORAGE_KEY}:myVote`) });
+        }
+      } else {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved && alive) setData({ ...empty, ...JSON.parse(saved) });
+        } catch { /* Keep the poll usable if browser storage is unavailable. */ }
+      }
+      if (alive) setReady(true);
+    }
+    void loadShared();
+    if (sharedVotingEnabled) {
+      const timer = window.setInterval(() => { void loadShared(); }, 15000);
+      return () => { alive = false; window.clearInterval(timer); };
+    }
+    return () => { alive = false; };
   }, []);
   const total = Object.values(data.counts).reduce((sum, n) => sum + n, 0);
-  function vote(id: string) {
+  async function vote(id: string) {
     if (data.myVote || !ready) return;
+    if (sharedVotingEnabled) {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/community_votes`, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_ANON_KEY!, Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json", Prefer: "return=minimal",
+          },
+          body: JSON.stringify({ role: id }),
+        });
+        if (!response.ok) throw new Error("Vote could not be saved");
+        localStorage.setItem(`${STORAGE_KEY}:myVote`, id);
+        setData((current) => ({ ...current, myVote: id, counts: { ...current.counts, [id]: (current.counts[id] || 0) + 1 } }));
+      } catch {
+        window.alert("Your vote could not be saved to the shared poll. Please try again later.");
+      }
+      return;
+    }
     const next = { counts: { ...data.counts, [id]: (data.counts[id] || 0) + 1 }, myVote: id };
     setData(next);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* Storage may be blocked. */ }
@@ -52,7 +99,7 @@ export default function CommunityPoll() {
                   </button>;
                 })}
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-steel">{data.myVote ? "Thanks for sharing your place in the community." : "Your selection is saved in this browser."}</p>
+              <p className="mt-4 text-xs leading-relaxed text-steel">{data.myVote ? "Thanks for sharing your place in the community." : "{sharedVotingEnabled ? "Your vote is saved to the community poll." : "Preview mode: this vote is saved only in this browser until shared voting is configured."}"}</p>
             </div>
           </Reveal>
           <Reveal delay={0.14}>
@@ -65,7 +112,7 @@ export default function CommunityPoll() {
                   return <div key={option.id}><div className="mb-2 flex items-center justify-between gap-3 text-sm"><span className="text-lab">{option.title}</span><span className="font-mono text-signal">{pct}% <span className="text-mist">({count})</span></span></div><div className="h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-signal transition-all duration-500" style={{ width: `${pct}%` }} /></div></div>;
                 })}
               </div>
-              <p className="mt-6 border-t border-line-dark pt-4 text-xs leading-relaxed text-mist">Statistics update when votes are cast in this browser. For shared, community-wide totals across all visitors and devices, connect a database or voting service.</p>
+              <p className="mt-6 border-t border-line-dark pt-4 text-xs leading-relaxed text-mist">{sharedVotingEnabled ? "Community-wide totals refresh automatically about every 15 seconds." : "Preview statistics are local to this browser. Configure Supabase to collect and display votes from all visitors and devices."}</p>
             </div>
           </Reveal>
         </div>

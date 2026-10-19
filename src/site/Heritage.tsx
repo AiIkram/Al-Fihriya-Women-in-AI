@@ -1,85 +1,13 @@
 import Reveal from "./Reveal";
 
-/** Blueprint-style astrolabe / observatory instrument, drawn in SVG */
-function HeritageInstrument() {
+/** Portrait supplied for the Al-Fihriya heritage section. */
+function HeritagePortrait() {
   return (
-    <div className="instrument-panel-dark relative overflow-hidden rounded-2xl p-6 sm:p-8">
-      <div className="flex items-center justify-between border-b border-line-dark pb-3">
-        <span className="label-plate text-signal">Artefact · Plan 859-AD</span>
-        <span className="label-plate text-mist">Al-Qarawiyyin, Fez</span>
-      </div>
-
-      <svg viewBox="0 0 420 340" className="mt-4 h-auto w-full" role="img" aria-label="Geometric plan of a classical observatory arch and astrolabe">
-        {/* blueprint arch */}
-        <path
-          d="M62 320 V170 C62 88 122 26 210 26 C298 26 358 88 358 170 V320"
-          fill="none"
-          stroke="#C5A880"
-          strokeOpacity="0.55"
-          strokeWidth="1.6"
-        />
-        <path
-          d="M84 320 V176 C84 104 136 50 210 50 C284 50 336 104 336 176 V320"
-          fill="none"
-          stroke="#C5A880"
-          strokeOpacity="0.25"
-          strokeWidth="1"
-          strokeDasharray="4 5"
-        />
-
-        {/* ground line */}
-        <line x1="30" y1="320" x2="390" y2="320" stroke="#C5A880" strokeOpacity="0.4" strokeWidth="1.2" />
-
-        {/* astrolabe rings */}
-        <g transform="translate(210,180)">
-          <circle r="96" fill="none" stroke="#C5A880" strokeOpacity="0.35" strokeWidth="1" />
-          <circle r="74" fill="none" stroke="#7BA3C9" strokeOpacity="0.4" strokeWidth="1" strokeDasharray="3 6" />
-          <circle r="50" fill="none" stroke="#C5A880" strokeOpacity="0.5" strokeWidth="1" />
-          <circle r="26" fill="none" stroke="#C5A880" strokeOpacity="0.7" strokeWidth="1.2" />
-
-          {/* axes */}
-          <line x1="-96" y1="0" x2="96" y2="0" stroke="#C5A880" strokeOpacity="0.22" />
-          <line x1="0" y1="-96" x2="0" y2="96" stroke="#C5A880" strokeOpacity="0.22" />
-
-          {/* rete pointers */}
-          {Array.from({ length: 12 }).map((_, i) => {
-            const a = (i * Math.PI) / 6;
-            const x = Math.cos(a) * 74;
-            const y = Math.sin(a) * 74;
-            return (
-              <g key={i}>
-                <line x1="0" y1="0" x2={x} y2={y} stroke="#C5A880" strokeOpacity="0.2" />
-                <circle cx={x} cy={y} r="2.4" fill="#C5A880" />
-              </g>
-            );
-          })}
-
-          <circle r="6" fill="#C5A880" />
-          <circle r="11" fill="none" stroke="#C5A880" strokeOpacity="0.5" />
-        </g>
-
-        {/* scale ticks */}
-        <g stroke="#C5A880" strokeOpacity="0.4">
-          {Array.from({ length: 25 }).map((_, i) => (
-            <line key={i} x1={30 + i * 15} y1="320" x2={30 + i * 15} y2={i % 5 === 0 ? 328 : 325} />
-          ))}
-        </g>
-
-        <text x="210" y="296" textAnchor="middle" className="fill-lab font-mono text-[11px] font-semibold tracking-[0.2em]">
-          AL-QARAWIYYIN
-        </text>
-      </svg>
-
-      <div className="mt-3 grid grid-cols-3 gap-2 border-t border-line-dark pt-3">
-        {[
-          ["Founded", "859 AD"],
-          ["Status", "Operating"],
-          ["Founder", "F. al-Fihri"],
-        ].map(([k, v]) => (
-          <div key={k}>
-            <div className="label-plate text-mist">{k}</div>
-            <div className="font-mono text-[12px] font-bold text-signal">{v}</div>
-          </div>
+    <div className="instrument-panel-dark overflow-hidden rounded-2xl">
+      <img src="/images/fatima-al-fihriya.png" alt="Historical-style portrait representing Fatima al-Fihriya, holding a manuscript" className="block h-auto max-h-[760px] w-full object-cover object-top" loading="lazy" />
+      <div className="grid grid-cols-3 gap-2 border-t border-line-dark px-5 py-4 sm:px-6">
+        {[["Founded", "859 AD"], ["Location", "Fez, Morocco"], ["Founder", "Fatima al-Fihri"]].map(([k, v]) => (
+          <div key={k}><div className="label-plate text-mist">{k}</div><div className="mt-1 font-mono text-[11px] font-bold text-signal sm:text-xs">{v}</div></div>
         ))}
       </div>
     </div>
@@ -130,7 +58,7 @@ export default function Heritage() {
           </Reveal>
 
           <Reveal delay={0.12}>
-            <HeritageInstrument />
+            <HeritagePortrait />
           </Reveal>
         </div>
       </div>

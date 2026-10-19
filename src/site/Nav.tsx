@@ -24,6 +24,13 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
@@ -71,7 +78,7 @@ export default function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain border-t border-line bg-lab px-5 py-5 lg:hidden"
+            className="border-t border-line bg-lab px-5 py-5 lg:hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -82,12 +89,7 @@ export default function Nav() {
                 <li key={l.href}>
                   <a
                     href={l.href}
-                    onClick={() => {
-                      // Do not lock body scrolling while the mobile menu is open:
-                      // native hash navigation can update the URL without scrolling on mobile.
-                      document.body.style.overflow = "";
-                      setOpen(false);
-                    }}
+                    onClick={() => setOpen(false)}
                     className="flex items-center gap-2.5 border-b border-line/70 py-3.5 font-display text-[17px] font-semibold text-carbon"
                   >
                     <span className="led bg-signal-deep" />

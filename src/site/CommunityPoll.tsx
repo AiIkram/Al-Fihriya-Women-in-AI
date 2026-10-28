@@ -8,74 +8,110 @@ const options = [
   { id: "career", title: "Career switcher / curious", description: "I'm exploring AI and finding my place." },
   { id: "other", title: "Something else", description: "My path doesn't fit one of these labels." },
 ];
-const STORAGE_KEY = "alfihriya-community-poll-v1";
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-const sharedVotingEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const STORAGE_KEY = "alfihriya-community-poll-v2";
+// Shared counter service (free, no account, no database of your own).
+// Change NAMESPACE to something unique to your project.
+const COUNTER_API = "https://abacus.jasoncameron.dev";
+const NAMESPACE = "alfihriya-women-in-ai-poll";
+const REFRESH_MS = 15000;
+
 type PollData = { counts: Record<string, number>; myVote: string | null };
-const empty: PollData = { counts: {}, myVote: null };
+type Status = "loading" | "live" | "offline";
+
+/** Parse public/votes.csv -> { role: count }. Used as the starting numbers. */
+function parseCsv(text: string): Record<string, number> {
+  const out: Record<string, number> = {};
+  text.split(/\r?\n/).slice(1).forEach((line) => {
+    const [role, count] = line.split(",").map((v) => v.trim());
+    if (role && !Number.isNaN(Number(count))) out[role] = Number(count);
+  });
+  return out;
+}
+
+async function fetchBaseline(): Promise<Record<string, number>> {
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}votes.csv`, { cache: "no-store" });
+    if (!res.ok) return {};
+    return parseCsv(await res.text());
+  } catch { return {}; }
+}
+
+async function fetchLive(id: string): Promise<number> {
+  const res = await fetch(`${COUNTER_API}/get/${NAMESPACE}/${id}`);
+  if (res.status === 404) return 0; // nobody has voted for this option yet
+  if (!res.ok) throw new Error("counter unavailable");
+  const json = (await res.json()) as { value?: number };
+  return Number(json.value) || 0;
+}
+
+async function hitLive(id: string): Promise<number> {
+  const res = await fetch(`${COUNTER_API}/hit/${NAMESPACE}/${id}`);
+  if (!res.ok) throw new Error("vote failed");
+  const json = (await res.json()) as { value?: number };
+  return Number(json.value) || 0;
+}
 
 export default function CommunityPoll() {
-  const [data, setData] = useState<PollData>(empty);
-  const [ready, setReady] = useState(false);
+  const [data, setData] = useState<PollData>({ counts: {}, myVote: null });
+  const [status, setStatus] = useState<Status>("loading");
+  const [busy, setBusy] = useState(false);
+  const [baseline, setBaseline] = useState<Record<string, number>>({});
+
   useEffect(() => {
     let alive = true;
-    async function loadShared() {
-      if (sharedVotingEnabled) {
-        try {
-          const response = await fetch(`${SUPABASE_URL}/rest/v1/community_votes?select=role`, {
-            headers: { apikey: SUPABASE_ANON_KEY!, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-          });
-          if (!response.ok) throw new Error("Could not load shared votes");
-          const rows = await response.json() as Array<{ role: string }>;
-          const counts: Record<string, number> = {};
-          rows.forEach(({ role }) => { counts[role] = (counts[role] || 0) + 1; });
-          const myVote = localStorage.getItem(`${STORAGE_KEY}:myVote`);
-          if (alive) setData({ counts, myVote });
-        } catch {
-          // Do not silently present local counts as community-wide statistics.
-          if (alive) setData({ ...empty, myVote: localStorage.getItem(`${STORAGE_KEY}:myVote`) });
-        }
-      } else {
-        try {
-          const saved = localStorage.getItem(STORAGE_KEY);
-          if (saved && alive) setData({ ...empty, ...JSON.parse(saved) });
-        } catch { /* Keep the poll usable if browser storage is unavailable. */ }
-      }
-      if (alive) setReady(true);
-    }
-    void loadShared();
-    if (sharedVotingEnabled) {
-      const timer = window.setInterval(() => { void loadShared(); }, 15000);
-      return () => { alive = false; window.clearInterval(timer); };
-    }
-    return () => { alive = false; };
-  }, []);
-  const total = Object.values(data.counts).reduce((sum, n) => sum + n, 0);
-  async function vote(id: string) {
-    if (data.myVote || !ready) return;
-    if (sharedVotingEnabled) {
+    const myVote = (() => { try { return localStorage.getItem(`${STORAGE_KEY}:myVote`); } catch { return null; } })();
+    async function load() {
       try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/community_votes`, {
-          method: "POST",
-          headers: {
-            apikey: SUPABASE_ANON_KEY!, Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json", Prefer: "return=minimal",
-          },
-          body: JSON.stringify({ role: id }),
-        });
-        if (!response.ok) throw new Error("Vote could not be saved");
-        localStorage.setItem(`${STORAGE_KEY}:myVote`, id);
-        setData((current) => ({ ...current, myVote: id, counts: { ...current.counts, [id]: (current.counts[id] || 0) + 1 } }));
+        const base = await fetchBaseline();
+        const live = await Promise.all(options.map((o) => fetchLive(o.id)));
+        if (!alive) return;
+        const counts: Record<string, number> = {};
+        options.forEach((o, i) => { counts[o.id] = (base[o.id] || 0) + live[i]; });
+        setBaseline(base);
+        setData((cur) => ({ counts, myVote: cur.myVote ?? myVote }));
+        setStatus("live");
       } catch {
-        window.alert("Your vote could not be saved to the shared poll. Please try again later.");
+        if (!alive) return;
+        // Service unreachable: show the CSV numbers, never fake "community" totals.
+        const base = await fetchBaseline();
+        setBaseline(base);
+        setData((cur) => ({ counts: base, myVote: cur.myVote ?? myVote }));
+        setStatus("offline");
       }
-      return;
     }
-    const next = { counts: { ...data.counts, [id]: (data.counts[id] || 0) + 1 }, myVote: id };
-    setData(next);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* Storage may be blocked. */ }
+    void load();
+    const timer = window.setInterval(() => { void load(); }, REFRESH_MS);
+    return () => { alive = false; window.clearInterval(timer); };
+  }, []);
+
+  const total = options.reduce((sum, o) => sum + (data.counts[o.id] || 0), 0);
+
+  async function vote(id: string) {
+    if (data.myVote || busy || status !== "live") return;
+    setBusy(true);
+    // Optimistic update so the bar moves instantly.
+    setData((cur) => ({ myVote: id, counts: { ...cur.counts, [id]: (cur.counts[id] || 0) + 1 } }));
+    try {
+      const live = await hitLive(id);
+      setData((cur) => ({ ...cur, counts: { ...cur.counts, [id]: (baseline[id] || 0) + live } }));
+      try { localStorage.setItem(`${STORAGE_KEY}:myVote`, id); } catch { /* storage blocked */ }
+    } catch {
+      setData((cur) => ({ myVote: null, counts: { ...cur.counts, [id]: Math.max(0, (cur.counts[id] || 1) - 1) } }));
+      window.alert("Your vote could not be saved. Please try again in a moment.");
+    } finally { setBusy(false); }
   }
+
+  function downloadCsv() {
+    const rows = ["role,count", ...options.map((o) => `${o.id},${data.counts[o.id] || 0}`)];
+    const blob = new Blob([rows.join("\n") + "\n"], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "votes.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  const ready = status === "live";
+
   return (
     <section id="bench" className="scroll-mt-20 border-t border-line bg-lab-panel/50 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5">
@@ -93,13 +129,13 @@ export default function CommunityPoll() {
               <div className="mt-4 space-y-3">
                 {options.map((option) => {
                   const selected = data.myVote === option.id;
-                  return <button key={option.id} type="button" onClick={() => vote(option.id)} disabled={!!data.myVote || !ready} className={`w-full rounded-xl border p-4 text-left transition-colors ${selected ? "border-signal-deep bg-signal/10" : "border-line bg-white hover:border-signal-deep"} disabled:cursor-default`}>
+                  return <button key={option.id} type="button" onClick={() => vote(option.id)} disabled={!!data.myVote || !ready || busy} className={`w-full rounded-xl border p-4 text-left transition-colors ${selected ? "border-signal-deep bg-signal/10" : "border-line bg-white hover:border-signal-deep"} disabled:cursor-default`}>
                     <span className="flex items-center justify-between gap-3"><span className="font-semibold text-carbon">{option.title}</span><span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${selected ? "border-signal-deep bg-signal-deep text-white" : "border-line"}`}>{selected ? "✓" : ""}</span></span>
                     <span className="mt-1 block text-sm leading-relaxed text-steel">{option.description}</span>
                   </button>;
                 })}
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-steel">{data.myVote ? "Thanks for sharing your place in the community." : sharedVotingEnabled ? "Your vote is saved to the community poll." : "Your vote is saved on this device. Votes from other visitors are not included without a shared server."}</p>
+              <p className="mt-4 text-xs leading-relaxed text-steel">{data.myVote ? "Thanks for sharing your place in the community." : status === "offline" ? "Voting is temporarily unavailable. Please try again later." : "Click an option to add your voice — everyone sees the update."}</p>
             </div>
           </Reveal>
           <Reveal delay={0.14}>
@@ -112,7 +148,8 @@ export default function CommunityPoll() {
                   return <div key={option.id}><div className="mb-2 flex items-center justify-between gap-3 text-sm"><span className="text-lab">{option.title}</span><span className="font-mono text-signal">{pct}% <span className="text-mist">({count})</span></span></div><div className="h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-signal transition-all duration-500" style={{ width: `${pct}%` }} /></div></div>;
                 })}
               </div>
-              <p className="mt-6 border-t border-line-dark pt-4 text-xs leading-relaxed text-mist">{sharedVotingEnabled ? "Community-wide totals refresh automatically about every 15 seconds." : "These totals are saved on this device and increase with each vote here. GitHub Pages alone cannot combine votes from different visitors."}</p>
+              <p className="mt-6 border-t border-line-dark pt-4 text-xs leading-relaxed text-mist">{status === "live" ? "Community-wide totals refresh automatically about every 15 seconds." : status === "loading" ? "Loading community totals…" : "Live totals are unavailable right now; showing the last saved numbers."}</p>
+              <button type="button" onClick={downloadCsv} className="mt-3 font-mono text-[11px] uppercase tracking-wider text-signal underline-offset-4 hover:underline">Download results (CSV)</button>
             </div>
           </Reveal>
         </div>
